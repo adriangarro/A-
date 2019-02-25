@@ -56,25 +56,21 @@
         <br><br><br><br>
         <div class="row no-gutters">
             <div class="col-6 col-md-4">
-                <!-- KEYBOARD -->
+                <!-- INPUTS -->
                 <div class="row">
                     <div class="row" id="inputDiv">
                         <div class="col-md-6">
-                            <label for="fromCurrency">Moneda de Origen: </label>
-                            <select id="fromCurrency" class="form-control input-sm" required></select>
-                            <br>
-                            <input id="inputValue" class="screen text-right" placeholder="Cantidad" readonly>
+                            <label for="graphJSON">Cargar grafo:</label>
+                            <input type="file" id="graphJSON" name="graphJSON" accept=".json">
                         </div>
                     </div>
                     <br>
-                    <div class="row">
-                        <button id="allClear" type="button" class="btn btn-danger">LIMPIAR</button>
-                    </div>
-                    <br>
-                    <div class="row">
-                        <button id="0" type="button" class="btn btn-info" style="margin:5px;">0</button>
-                        <button id="comma" type="button" class="btn btn-info" style="margin:5px;">,</button>
-                        <button id="equals" type="button" class="btn btn-success" style="margin:5px;">CONVERTIR ALEATORIAMENTE</button>
+                    <div hidden class="row" id="aStarControl">
+                        <label for="startNodeSelect">Inicio:</label>
+                        <select id="startNodeSelect" name="startNodeSelect"></select>
+                        <label for="endNodeSelect">Fin:</label>
+                        <select id="endNodeSelect" name="endNodeSelect"></select>
+                        <button id="calc" type="button" class="btn btn-info" style="margin:5px;">CALCULAR RUTA</button>
                     </div>
                 </div>
             </div>

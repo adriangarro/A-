@@ -182,57 +182,48 @@ function drawGraph(labels, graph) {
 }
 
 function test() {
-    let l = {
-        1: "Paraíso",
-        2: "Río Azul",
-        3: "Desamparados",
-        4: "Cartago",
-        5: "Curridabat",
-        6: "TEC San José",
-        7: "Turrialba",
-        8: "Tres Ríos",
-        9: "Coronado",
-        10: "Pavas",
-        11: "Rancho Redondo"
-    };
-
-    let g = {
-        1: {2: 20, 4: 40, 7: 10, 8: 21},
-        2: {3: 10, 5: 3, 1: 2},
-        3: {5: 13, 6: 7},
-        4: {11: 15},
-        5: {4: 1, 6: 8, 3: 1},
-        6: {},
-        7: {11: 12},
-        8: {9: 3},
-        9: {10: 9, 5: 12},
-        10: {5: 11, 6: 14},
-        11: {9: 5}
-    };
-
-    let c = {
-        1 : {x: 9, y: 2}, 
-        2 : {x: 10, y: 4}, 
-        3 : {x: 10, y: 8}, 
-        4 : {x: 6, y: 3},
-        5 : {x: 5, y: 8},
-        6 : {x: 6, y: 11},
-        7 : {x: 3, y: 4},
-        8 : {x: 4, y: 6},
-        9 : {x: 2, y: 9},
-        10 : {x: 4, y: 10},
-        11 : {x: 1, y: 7}
-    };
-
-    drawGraph(l, g);
-    
-    const astar = new AStar(g, c);
+    let network = sessionStorage.getItem("network");
+    const astar = new AStar(network.g, network.c);
     astar.run(1, 6);
+
+}
+
+function loadGraph() {
+    function onReaderLoad(event) {
+        // save network
+        let network = JSON.parse(event.target.result);
+        console.log(network);
+        sessionStorage.setItem("network", JSON.stringify(network));
+        // set selects
+        $("#startNodeSelect").empty();
+        $("#endNodeSelect").empty();
+        $.each(network.l, (key, value) => {
+            let nodeOption = "<option value="
+                + key
+                + ">"
+                + value
+                + "</option>";
+            $(nodeOption).appendTo("#startNodeSelect");
+            $(nodeOption).appendTo("#endNodeSelect");
+        });
+        // show A* control
+        $("#aStarControl").show();
+        // draw graph
+        drawGraph(network.l, network.g);
+    }
+    $("#graphJSON").change(function (event) {
+        let reader = new FileReader();
+        reader.onload = onReaderLoad;
+        reader.readAsText(event.target.files[0]);
+    });
+}
+
+function drawPath() {
 
 }
 
 jQuery(
     $(document).ready(function () {
-        test()
+        loadGraph()
     })
 );
