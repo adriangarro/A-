@@ -95,8 +95,16 @@ class AStar {
             f: 0
         });
         let currentNode = null;
+        let loop = 1;
+        let nodesQuant = Object.keys(this.graph).length;
         while (notExpanded.length > 0) {
-            console.log("A* Loop");
+            console.log("A* Loop:");
+            console.log(loop);
+            if (loop == nodesQuant * 2) {
+                alert("No manera de resolver este problema.");
+                return [startNodeID];
+            }
+            loop = loop + 1;
             let currentNodeIndex = this.getNodeWithMinCost(notExpanded);
             currentNode = notExpanded[currentNodeIndex];
             console.log("Current Node:");
@@ -129,36 +137,71 @@ class AStar {
         path.push(currentNode.id);
         while (currentNode.uid != startNodeUID) {
             currentNode = this.getNode(currentNode.parent, expanded);
-            path.push(currentNode.id);
+            path.unshift(currentNode.id);
         }
         // print path
         console.log("Path:");
-        for (let i = path.length - 1; i >= 0; --i) {
+        for (let i = 0; i < path.length; ++i) {
             console.log(path[i]);
-            if (i != 0) console.log("->");
+            if (i != path.length - 1) console.log("->");
         }
-
+        return path;
     }
 }
 
 // not using coordinates (by the moment)
-function drawGraph(labels, graph) {
+function drawGraph(labels, graph, path) {
     // create an array with nodes
     let nodesArr = [];
     $.each(labels, (key, value) => {
-        nodesArr.push({id: key, label: value});
+        if (path) {
+            if (path.includes(key)) {
+                nodesArr.push({
+                    id: key, 
+                    label: value,
+                    font: {strokeWidth: 2, strokeColor : "#00ff00"}
+                });
+            } else {
+                nodesArr.push({
+                    id: key, 
+                    label: value
+                });
+            }
+        } else {
+            nodesArr.push({
+                id: key, 
+                label: value
+            });
+        }
     });
     let nodes = new vis.DataSet(nodesArr);
+    // trick to paint path
+    let edgesPainted = {};
+    if (path) {
+        for (let i = 0; i < path.length - 1; ++i) {
+            edgesPainted[path[i]] = path[i+1];
+        }
+    }
     // create an array with edges
     let edgesArr = [];
     for (let node = 1; node <= Object.keys(graph).length; ++node) {
         $.each(graph[node], (neighbour, distance) => {
-            edgesArr.push({
-                from: node, 
-                to: neighbour, 
-                label: distance.toString(),
-                font: {'face': 'Monospace', align: 'left'}
-            });
+            if (edgesPainted[node] == neighbour) {
+                edgesArr.push({
+                    from: node, 
+                    to: neighbour, 
+                    label: distance.toString(),
+                    arrows: "to",
+                    font: {strokeWidth: 2, strokeColor : "#00ff00"}
+                });
+            } else {
+                edgesArr.push({
+                    from: node,
+                    to: neighbour,
+                    label: distance.toString(),
+                    arrows: "to"
+                });
+            }
         });
     }
     let edges = new vis.DataSet(edgesArr);
@@ -169,29 +212,16 @@ function drawGraph(labels, graph) {
         nodes: nodes,
         edges: edges
     };
-    let options = {
-        edges: {
-            font: {
-                size: 15,
-                color: "blue"
-            }
-        }
-    };
+    let options = {};
     // initialize network!
     let network = new vis.Network(container, data, options);
-}
-
-function test() {
-    let network = sessionStorage.getItem("network");
-    const astar = new AStar(network.g, network.c);
-    astar.run(1, 6);
-
 }
 
 function loadGraph() {
     function onReaderLoad(event) {
         // save network
         let network = JSON.parse(event.target.result);
+        console.log("Network:")
         console.log(network);
         sessionStorage.setItem("network", JSON.stringify(network));
         // set selects
@@ -209,7 +239,7 @@ function loadGraph() {
         // show A* control
         $("#aStarControl").show();
         // draw graph
-        drawGraph(network.l, network.g);
+        drawGraph(network.l, network.g, null);
     }
     $("#graphJSON").change(function (event) {
         let reader = new FileReader();
@@ -219,11 +249,20 @@ function loadGraph() {
 }
 
 function drawPath() {
-
+    $("#calc").click(function () {
+        let network =  JSON.parse(sessionStorage.getItem("network"));
+        const astar = new AStar(network.g, network.c);
+        let path = astar.run(
+            $("#startNodeSelect").val(), 
+            $("#endNodeSelect").val()
+        );
+        drawGraph(network.l, network.g, path);
+    });
 }
 
 jQuery(
     $(document).ready(function () {
-        loadGraph()
+        loadGraph(),
+        drawPath()
     })
 );
