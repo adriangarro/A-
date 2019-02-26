@@ -51,7 +51,7 @@ class AStar {
 
     // expensive function :v
     nodeIsReachableBy(nodeID) {
-        // no results found
+        // no hay results found
         let result = -1;
         // check if node is reachable
         for (let node = 1; node <= Object.keys(this.graph).length; ++node) {
@@ -101,7 +101,7 @@ class AStar {
             console.log("A* Loop:");
             console.log(loop);
             if (loop == nodesQuant * 2) {
-                alert("No manera de resolver este problema.");
+                alert("No hay manera de resolver este problema.");
                 return [startNodeID];
             }
             loop = loop + 1;
