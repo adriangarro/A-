@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    <title>A* Search</title>
+    <style>
+        #network {
+            width: 800px;
+            height: 800px;
+            border: 1px solid #444444;
+            background-color: #222222;
+        }
+    </style>
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <link rel="stylesheet" type="text/css"
+        href="https://fonts.googleapis.com/css?family=Open+Sans|Candal|Alegreya+Sans">
+    <link rel="stylesheet" type="text/css" href="css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="css/imagehover.min.css">
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link rel="stylesheet" type="text/css" href="css/vis.min.css">
+</head>
+<body>
+
+<!-- Navigation Bar -->
+<nav id="welcomeNav" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#customerNavbar">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="index.html">A*<span>Search</span></a>
+        </div>
+    </div>
+</nav>
+<!-- Navigation Bar -->
+
+<!-- ************************** Welcome Content *************************** -->
+
+<!-- Feature -->
+<section id="feature" class="section-padding">
+    <div class="container">
+        <div class="row">
+            <h1 class="text-center">¡Bienvenido(a)!</h1>
+        </div>
+        <br><br><br><br>
+        <div class="row no-gutters">
+            <div class="col-6 col-md-4">
+                <!-- INPUTS -->
+                <div class="row">
+                    <div class="row" id="inputDiv">
+                        <div class="col-md-6">
+                            <label for="graphJSON">Cargar grafo:</label>
+                            <input type="file" id="graphJSON" name="graphJSON" accept=".json">
+                        </div>
+                    </div>
+                    <br>
+                    <div hidden class="row" id="aStarControl">
+                        <label for="startNodeSelect">Inicio:</label>
+                        <select id="startNodeSelect" name="startNodeSelect"></select>
+                        <label for="endNodeSelect">Fin:</label>
+                        <select id="endNodeSelect" name="endNodeSelect"></select>
+                        <button id="calc" type="button" class="btn btn-info" style="margin:5px;">CALCULAR RUTA</button>
+                    </div>
+                </div>
+            </div>
+            <br><br>
+            <!-- NETWORK -->
+            <div class="col-12 col-sm-6 col-md-8">
+                <div id="network"></div>
+            </div>
+        </div>
+    </div>
+</section>
+<hr>
+<!-- Feature -->
+
+<!-- Footer -->
+<footer id="complexFooter">
+    <div class="row">
+        <div class="col-lg-12 mx-auto text-center">
+            <h2 style="color:black;">
+                A* Search
+            </h2>
+            <ul class="list-unstyled">
+                <li>
+                    <!-- <i class="fa fa-mobile fa-fw"></i>85635561-->
+                    <i class="fa fa-envelope-o fa-fw"></i>
+                    <a href="mailto:@">adriangarro81@gmail.com</a>
+                </li>
+                <li>
+                    <i class="fa fa-envelope-o fa-fw"></i>
+                    <a href="mailto:@">dmcsubotai95@gmail.com</a>
+                </li>
+                <li>
+                    <i class="fa fa-envelope-o fa-fw"></i>
+                    <a href="mailto:@">andresarriaga7@gmail.com</a>
+                </li>
+            </ul>
+            <br>
+            <hr class="small">
+            <p class="text-muted">Copyright &copy; Adrián Garro, Darío Monestel, Andrés Arriaga</p>
+        </div>
+    </div>
+</footer>
+<!-- Footer -->
+
+<!-- Scripts -->
+<!-- jQuery -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<!-- Bootstrap -->
+<script src="js/bootstrap.min.js"></script>
+<!-- Index -->
+<script src="js/index.js"></script>
+<!-- Vis -->
+<script src="js/vis.min.js"></script>
+<!-- Scripts -->
+
+</body>
+</html>
