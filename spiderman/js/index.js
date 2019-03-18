@@ -31,11 +31,16 @@ class AStar {
         console.log(this.graph);
     }
 
-    // TODO Manhattan
     euclideanDistance(pointA, pointB) {
         let a = pointA.x - pointB.x;
         let b = pointA.y - pointB.y;
         return Math.sqrt(a*a + b*b);
+    }
+
+    manhattanDistance(pointA, pointB) {
+        let a = Math.abs(pointA.x - pointB.x);
+        let b = Math.abs(pointA.y - pointB.y);
+        return a + b;
     }
 
     getNodeWithMinCost(arrayNodes) {
@@ -120,7 +125,7 @@ class AStar {
                     parent: currentNode.uid,
                     id: neighbour,
                     uid: this.getUID(),
-                    f: currentNode.f + distance + this.euclideanDistance(
+                    f: currentNode.f + distance + this.manhattanDistance(
                         this.coordinates[currentNode.id], this.coordinates[endNodeID]
                     )
                 });
