@@ -31,6 +31,7 @@ class AStar {
         console.log(this.graph);
     }
 
+    // TODO Manhattan
     euclideanDistance(pointA, pointB) {
         let a = pointA.x - pointB.x;
         let b = pointA.y - pointB.y;
@@ -260,9 +261,88 @@ function drawPath() {
     });
 }
 
+// Voice Processor (ONLY GOOGLE CHROME)
+
+class VoiceProcessor {
+    constructor() {
+        this.recognition = null;
+        try {
+            let SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            this.recognition = new SpeechRecognition();
+        }
+        catch(e) {
+            console.error(e);
+            $(".no-browser-support").show();
+            $(".app").hide();
+        }
+        // Configure voice recognition 
+        if (this.recognition) {
+            // If false, the recording will stop after a few seconds of silence.
+            // When true, the silence period is longer (about 15 seconds),
+            // allowing us to keep recording even when the user pauses. 
+            this.recognition.continuous = true;
+            // This block is called every time the Speech APi captures a line. 
+            this.recognition.onresult = function(event) {
+                // event is a SpeechRecognitionEvent object.
+                // It holds all the lines we have captured so far. 
+                // We only need the current one.
+                let current = event.resultIndex;
+                // Get a transcript of what was said.
+                let transcript = event.results[current][0].transcript;
+                console.log(transcript);
+            }
+            this.recognition.onstart = function() { 
+                console.log("Voice recognition activated. Try speaking into the microphone.");
+            }
+            this.recognition.onspeechend = function() {
+                console.log("You were quiet for a while so voice recognition turned itself off.");
+            }
+            this.recognition.onerror = function(event) {
+                if (event.error == "no-speech") {
+                    console.log("No speech was detected. Try again.");  
+                }
+            }
+        }
+    }
+
+    startRecognition() {
+        this.recognition.start();
+    }
+
+    stopRecognition() {
+        this.recognition.stop();
+    }
+
+    readOutLoud(message) {
+        let speech = new SpeechSynthesisUtterance();
+        // set the text and voice attributes.
+        speech.text = message;
+        speech.volume = 1;
+        speech.rate = 1;
+        speech.pitch = 1;
+        window.speechSynthesis.speak(speech);
+    }
+}
+
+const voiceProcessor = new VoiceProcessor();
+
+function controlRecognition() {
+    $(document).on("keypress", function(e) {
+        // if press enter
+        if (e.which == 13) {
+            voiceProcessor.startRecognition();
+        }
+        // if press space
+        if (e.which == 32) {
+            voiceProcessor.stopRecognition();
+        }
+    });
+}
+
 jQuery(
     $(document).ready(function () {
         loadGraph(),
-        drawPath()
+        drawPath(),
+        controlRecognition()
     })
 );
