@@ -266,6 +266,32 @@ function drawPath() {
     });
 }
 
+// stringHelpers
+
+function removeAccents(strAccents) {
+	strAccents = strAccents.split("");
+	let strAccentsOut = new Array();
+	let strAccentsLen = strAccents.length;
+	let accents = "ÀÁÂÃÄÅàáâãäåÒÓÔÕÕÖØòóôõöøÈÉÊËèéêëðÇçÐÌÍÎÏìíîïÙÚÛÜùúûüŠšŸÿýŽž";
+	let accentsOut = "AAAAAAaaaaaaOOOOOOOooooooEEEEeeeeeCcDIIIIiiiiUUUUuuuuSsYyyZz";
+	for (let y = 0; y < strAccentsLen; y++) {
+		if (accents.indexOf(strAccents[y]) !== -1) {
+			strAccentsOut[y] = accentsOut.substr(accents.indexOf(strAccents[y]), 1);
+		} else {
+			strAccentsOut[y] = strAccents[y];
+		}
+	}
+	strAccentsOut = strAccentsOut.join("");
+	return strAccentsOut;
+}
+
+// removeAccents + toUpperCase
+function fixMessage(input) {
+	return removeAccents(
+        input
+    ).toUpperCase();
+}
+
 // Voice Processor (ONLY GOOGLE CHROME)
 
 class VoiceProcessor {
@@ -294,13 +320,14 @@ class VoiceProcessor {
                 let current = event.resultIndex;
                 // Get a transcript of what was said.
                 let transcript = event.results[current][0].transcript;
+                sessionStorage.setItem("transcript", transcript);
                 console.log(transcript);
             }
             this.recognition.onstart = function() { 
-                console.log("Voice recognition activated. Try speaking into the microphone.");
+                console.log("Voice recognition activated.");
             }
             this.recognition.onspeechend = function() {
-                console.log("You were quiet for a while so voice recognition turned itself off.");
+                console.log("Voice recognition turned off.");
             }
             this.recognition.onerror = function(event) {
                 if (event.error == "no-speech") {
@@ -320,7 +347,7 @@ class VoiceProcessor {
 
     readOutLoud(message) {
         let speech = new SpeechSynthesisUtterance();
-        // set the text and voice attributes.
+        // set text and voice attributes
         speech.text = message;
         speech.volume = 1;
         speech.rate = 1;
@@ -330,16 +357,55 @@ class VoiceProcessor {
 }
 
 const voiceProcessor = new VoiceProcessor();
-
 function controlRecognition() {
     $(document).on("keypress", function(e) {
-        // if press enter
-        if (e.which == 13) {
+        // if press 1
+        if (e.which === 49) {
             voiceProcessor.startRecognition();
         }
-        // if press space
-        if (e.which == 32) {
+        // if press 0
+        else if (e.which === 48) {
             voiceProcessor.stopRecognition();
+            setTimeout(function() {
+                let transcript = sessionStorage.getItem("transcript");
+                if (transcript) {
+                    sessionStorage.removeItem("transcript");
+                    let command = fixMessage(transcript).split(" ");
+                    if (command[0] === "LIMPIAR") {
+                        window.location = "index.html";
+                    }
+                    // M
+                    else if (command[0] === "ALTURA") {
+                        if (command[1] === "IGUAL" || command[1] === "=") {
+                            // value: command[2]
+                            alert(command);
+                        }
+                    }
+                    // N
+                    else if (command[0] === "LARGO") {
+                        if (command[1] === "IGUAL" || command[1] === "=") {
+                            alert(command);
+                        }
+                    }
+                    // A
+                    else if (command[0] === "CUADRADO") {
+                        if (command[1] === "IGUAL" || command[1] === "=") {
+                            alert(command);
+                        }
+                    }
+                    // D
+                    else if (command[0] === "DIAGONAL") {
+                        if (command[1] === "IGUAL" || command[1] === "=") {
+                            alert(command);
+                        }
+                    }
+                    else {
+                        voiceProcessor.readOutLoud("Comando no identificado.");
+                    }
+                } else {
+                    voiceProcessor.readOutLoud("No se ha procesado niguna orden.");
+                }
+            }, 1000);
         }
     });
 }
