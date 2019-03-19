@@ -292,6 +292,11 @@ function fixMessage(input) {
     ).toUpperCase();
 }
 
+function isNormalInteger(str) {
+    let n = Math.floor(Number(str));
+    return n !== Infinity && String(n) === str && n > 0;
+}
+
 // Voice Processor (ONLY GOOGLE CHROME)
 
 class VoiceProcessor {
@@ -377,29 +382,43 @@ function controlRecognition() {
                     // M
                     else if (command[0] === "ALTURA") {
                         if (command[1] === "IGUAL" || command[1] === "=") {
-                            // value: command[2]
-                            alert(command);
+                            if ( isNormalInteger(command[2]) ) {
+                                $("#m").val( "Altura (" + command[2] + ")" );
+                            } else {
+                                voiceProcessor.readOutLoud("Valor inválido.");
+                            }
                         }
                     }
                     // N
                     else if (command[0] === "LARGO") {
                         if (command[1] === "IGUAL" || command[1] === "=") {
-                            alert(command);
+                            if ( isNormalInteger(command[2]) ) {
+                                $("#n").val( "Largo (" + command[2] + ")");
+                            } else {
+                                voiceProcessor.readOutLoud("Valor inválido.");
+                            }
                         }
                     }
                     // A
                     else if (command[0] === "CUADRADO") {
                         if (command[1] === "IGUAL" || command[1] === "=") {
-                            alert(command);
+                            if ( isNormalInteger(command[2]) ) {
+                                $("#a").val( "Cuadrado (" + command[2] + ")" );
+                            } else {
+                                voiceProcessor.readOutLoud("Valor inválido.");
+                            }
                         }
                     }
                     // D
                     else if (command[0] === "DIAGONAL") {
                         if (command[1] === "IGUAL" || command[1] === "=") {
-                            alert(command);
+                            if ( isNormalInteger(command[2]) ) {
+                                $("#d").val( "Diagonal (" + command[2] + ")");
+                            } else {
+                                voiceProcessor.readOutLoud("Valor inválido.");
+                            }
                         }
-                    }
-                    else {
+                    } else {
                         voiceProcessor.readOutLoud("Comando no identificado.");
                     }
                 } else {
