@@ -296,15 +296,18 @@ function createJSONGraph(m, n, d) {
         if (currentNodeEntry.i == 1 && currentNodeEntry.j == 1) {
             // E
             let c1KeyE = findGraphKeyByEntry(graph["e"], currentNodeEntry.i, currentNodeEntry.j+1);
-            // SE
-            let c1KeySE = findGraphKeyByEntry(graph["e"], currentNodeEntry.i+1, currentNodeEntry.j+1);
             // S
             let c1KeyS = findGraphKeyByEntry(graph["e"], currentNodeEntry.i+1, currentNodeEntry.j);
             graph["g"][node.toString()] = {
                 [c1KeyE] : 1,
-                [c1KeySE] : 1,
                 [c1KeyS] : 1
             };
+            // diagonals
+            if (d == "true") {
+                // SE
+                let c1KeySE = findGraphKeyByEntry(graph["e"], currentNodeEntry.i+1, currentNodeEntry.j+1);
+                graph["g"][node.toString()][c1KeySE] = 1;
+            }
         }
         // c2
         if (currentNodeEntry.i == 1 && 1 < currentNodeEntry.j && currentNodeEntry.j < n) {
@@ -312,151 +315,175 @@ function createJSONGraph(m, n, d) {
             let c2KeyW = findGraphKeyByEntry(graph["e"], currentNodeEntry.i, currentNodeEntry.j-1);
             // E
             let c2KeyE = findGraphKeyByEntry(graph["e"], currentNodeEntry.i, currentNodeEntry.j+1);
-            // SW
-            let c2KeySW = findGraphKeyByEntry(graph["e"], currentNodeEntry.i+1, currentNodeEntry.j-1);
             // S
             let c2KeyS = findGraphKeyByEntry(graph["e"], currentNodeEntry.i+1, currentNodeEntry.j);
-            // SE
-            let c2KeySE = findGraphKeyByEntry(graph["e"], currentNodeEntry.i+1, currentNodeEntry.j+1);
             graph["g"][node.toString()] = {
                 [c2KeyW] : 1,
                 [c2KeyE] : 1,
-                [c2KeySW] : 1,
-                [c2KeyS] : 1,
-                [c2KeySE] : 1
+                [c2KeyS] : 1
             };
+            // diagonals
+            if (d == "true") {
+                // SW
+                let c2KeySW = findGraphKeyByEntry(graph["e"], currentNodeEntry.i+1, currentNodeEntry.j-1);
+                graph["g"][node.toString()][c2KeySW] = 1;
+                // SE
+                let c2KeySE = findGraphKeyByEntry(graph["e"], currentNodeEntry.i+1, currentNodeEntry.j+1);
+                graph["g"][node.toString()][c2KeySE] = 1;
+            }
         }
         // c3
         if (currentNodeEntry.i == 1 && currentNodeEntry.j == n) {
             // W
             let c3KeyW = findGraphKeyByEntry(graph["e"], currentNodeEntry.i, currentNodeEntry.j-1);
-            // SW
-            let c3KeySW = findGraphKeyByEntry(graph["e"], currentNodeEntry.i+1, currentNodeEntry.j-1);
             // S
             let c3KeyS = findGraphKeyByEntry(graph["e"], currentNodeEntry.i+1, currentNodeEntry.j);
             graph["g"][node.toString()] = {
                 [c3KeyW] : 1,
-                [c3KeySW] : 1,
                 [c3KeyS] : 1
             };
+            // diagonals
+            if (d == "true") {
+                // SW
+                let c3KeySW = findGraphKeyByEntry(graph["e"], currentNodeEntry.i+1, currentNodeEntry.j-1);
+                graph["g"][node.toString()][c3KeySW] = 1;
+            }
         }
         // c4
         if (1 < currentNodeEntry.i && currentNodeEntry.i < m && currentNodeEntry.j == 1) {
             // N
             let c4KeyN = findGraphKeyByEntry(graph["e"], currentNodeEntry.i-1, currentNodeEntry.j);
-            // NE
-            let c4KeyNE = findGraphKeyByEntry(graph["e"], currentNodeEntry.i-1, currentNodeEntry.j+1);
             // E
             let c4KeyE = findGraphKeyByEntry(graph["e"], currentNodeEntry.i, currentNodeEntry.j+1);
-            // SE
-            let c4KeySE = findGraphKeyByEntry(graph["e"], currentNodeEntry.i+1, currentNodeEntry.j+1);
             // S
             let c4KeyS = findGraphKeyByEntry(graph["e"], currentNodeEntry.i+1, currentNodeEntry.j);
             graph["g"][node.toString()] = {
                 [c4KeyN] : 1,
-                [c4KeyNE] : 1,
                 [c4KeyE] : 1,
-                [c4KeySE] : 1,
                 [c4KeyS] : 1
             };
+            // diagonals
+            if (d == "true") {
+                // NE
+                let c4KeyNE = findGraphKeyByEntry(graph["e"], currentNodeEntry.i-1, currentNodeEntry.j+1);
+                graph["g"][node.toString()][c4KeyNE] = 1;
+                // SE
+                let c4KeySE = findGraphKeyByEntry(graph["e"], currentNodeEntry.i+1, currentNodeEntry.j+1);
+                graph["g"][node.toString()][c4KeySE] = 1;
+            }
         }
         // c5
         if (1 < currentNodeEntry.i && currentNodeEntry.i < m 
             && 1 < currentNodeEntry.j && currentNodeEntry.j < n) {
                 // W
                 let c5KeyW = findGraphKeyByEntry(graph["e"], currentNodeEntry.i, currentNodeEntry.j-1);
-                // NW
-                let c5KeyNW = findGraphKeyByEntry(graph["e"], currentNodeEntry.i-1, currentNodeEntry.j-1);
                 // N
                 let c5KeyN = findGraphKeyByEntry(graph["e"], currentNodeEntry.i-1, currentNodeEntry.j);
-                // NE
-                let c5KeyNE = findGraphKeyByEntry(graph["e"], currentNodeEntry.i-1, currentNodeEntry.j+1);
                 // E
                 let c5KeyE = findGraphKeyByEntry(graph["e"], currentNodeEntry.i, currentNodeEntry.j+1);
-                // SE
-                let c5KeySE = findGraphKeyByEntry(graph["e"], currentNodeEntry.i+1, currentNodeEntry.j+1);
                 // S
                 let c5KeyS = findGraphKeyByEntry(graph["e"], currentNodeEntry.i+1, currentNodeEntry.j);
-                // SW
-                let c5KeySW = findGraphKeyByEntry(graph["e"], currentNodeEntry.i+1, currentNodeEntry.j-1);
                 graph["g"][node.toString()] = {
                     [c5KeyW] : 1,
-                    [c5KeyNW] : 1,
                     [c5KeyN] : 1,
-                    [c5KeyNE] : 1,
                     [c5KeyE] : 1,
-                    [c5KeySE] : 1,
-                    [c5KeyS] : 1,
-                    [c5KeySW] : 1
+                    [c5KeyS] : 1
                 };
+                // diagonals
+                if (d == "true") {
+                    // NW
+                    let c5KeyNW = findGraphKeyByEntry(graph["e"], currentNodeEntry.i-1, currentNodeEntry.j-1);
+                    graph["g"][node.toString()][c5KeyNW] = 1;
+                    // NE
+                    let c5KeyNE = findGraphKeyByEntry(graph["e"], currentNodeEntry.i-1, currentNodeEntry.j+1);
+                    graph["g"][node.toString()][c5KeyNE] = 1;
+                    // SE
+                    let c5KeySE = findGraphKeyByEntry(graph["e"], currentNodeEntry.i+1, currentNodeEntry.j+1);
+                    graph["g"][node.toString()][c5KeySE] = 1;
+                    // SW
+                    let c5KeySW = findGraphKeyByEntry(graph["e"], currentNodeEntry.i+1, currentNodeEntry.j-1);
+                    graph["g"][node.toString()][c5KeySW] = 1;
+                }
             }
         // c6
         if (1 < currentNodeEntry.i && currentNodeEntry.i < m && currentNodeEntry.j == n) {
             // N
             let c6KeyN = findGraphKeyByEntry(graph["e"], currentNodeEntry.i-1, currentNodeEntry.j);
-            // NW
-            let c6KeyNW = findGraphKeyByEntry(graph["e"], currentNodeEntry.i-1, currentNodeEntry.j-1);
             // W
             let c6KeyW = findGraphKeyByEntry(graph["e"], currentNodeEntry.i, currentNodeEntry.j-1);
-            // SW
-            let c6KeySW = findGraphKeyByEntry(graph["e"], currentNodeEntry.i+1, currentNodeEntry.j-1);
             // S
             let c6KeyS = findGraphKeyByEntry(graph["e"], currentNodeEntry.i+1, currentNodeEntry.j);
             graph["g"][node.toString()] = {
                 [c6KeyN] : 1,
-                [c6KeyNW] : 1,
                 [c6KeyW] : 1,
-                [c6KeySW] : 1,
                 [c6KeyS] : 1
             };
+            // diagonals
+            if (d == "true") {
+                // NW
+                let c6KeyNW = findGraphKeyByEntry(graph["e"], currentNodeEntry.i-1, currentNodeEntry.j-1);
+                graph["g"][node.toString()][c6KeyNW] = 1;
+                // SW
+                let c6KeySW = findGraphKeyByEntry(graph["e"], currentNodeEntry.i+1, currentNodeEntry.j-1);
+                graph["g"][node.toString()][c6KeySW] = 1;
+            }
         }
         // c7
         if (currentNodeEntry.i == m && currentNodeEntry.j == 1) {
             // N
             let c7KeyN = findGraphKeyByEntry(graph["e"], currentNodeEntry.i-1, currentNodeEntry.j);
-            // NE
-            let c7KeyNE = findGraphKeyByEntry(graph["e"], currentNodeEntry.i-1, currentNodeEntry.j+1);
             // E
             let c7KeyE = findGraphKeyByEntry(graph["e"], currentNodeEntry.i, currentNodeEntry.j+1);
             graph["g"][node.toString()] = {
                 [c7KeyN] : 1,
-                [c7KeyNE] : 1,
                 [c7KeyE] : 1
             };
+            // diagonals
+            if (d == "true") {
+                // NE
+                let c7KeyNE = findGraphKeyByEntry(graph["e"], currentNodeEntry.i-1, currentNodeEntry.j+1);
+                graph["g"][node.toString()][c7KeyNE] = 1;
+            }
         }
         // c8
         if (currentNodeEntry.i == m && 1 < currentNodeEntry.j && currentNodeEntry.j < n) {
             // W
             let c8KeyW = findGraphKeyByEntry(graph["e"], currentNodeEntry.i, currentNodeEntry.j-1);
-            // NW
-            let c8KeyNW = findGraphKeyByEntry(graph["e"], currentNodeEntry.i-1, currentNodeEntry.j-1);
             // N
             let c8KeyN = findGraphKeyByEntry(graph["e"], currentNodeEntry.i-1, currentNodeEntry.j);
-            // NE
-            let c8KeyNE = findGraphKeyByEntry(graph["e"], currentNodeEntry.i-1, currentNodeEntry.j+1);
             // E
             let c8KeyE = findGraphKeyByEntry(graph["e"], currentNodeEntry.i, currentNodeEntry.j+1);
             graph["g"][node.toString()] = {
                 [c8KeyW] : 1,
-                [c8KeyNW] : 1,
                 [c8KeyN] : 1,
-                [c8KeyNE] : 1,
                 [c8KeyE] : 1
             };
+            // diagonals
+            if (d == "true") {
+                // NW
+                let c8KeyNW = findGraphKeyByEntry(graph["e"], currentNodeEntry.i-1, currentNodeEntry.j-1);
+                graph["g"][node.toString()][c8KeyNW] = 1;
+                // NE
+                let c8KeyNE = findGraphKeyByEntry(graph["e"], currentNodeEntry.i-1, currentNodeEntry.j+1);
+                graph["g"][node.toString()][c8KeyNE] = 1;
+            }
         }
         // c9
         if (currentNodeEntry.i == m && currentNodeEntry.j == n) {
             // N
             let c9KeyN = findGraphKeyByEntry(graph["e"], currentNodeEntry.i-1, currentNodeEntry.j);
-            // NW
-            let c9KeyNW = findGraphKeyByEntry(graph["e"], currentNodeEntry.i-1, currentNodeEntry.j-1);
             // W
             let c9KeyW = findGraphKeyByEntry(graph["e"], currentNodeEntry.i, currentNodeEntry.j-1);
             graph["g"][node.toString()] = {
                 [c9KeyN] : 1,
-                [c9KeyNW] : 1,
                 [c9KeyW] : 1
             };
+            // diagonals
+            if (d == "true") {
+                // NW
+                let c9KeyNW = findGraphKeyByEntry(graph["e"], currentNodeEntry.i-1, currentNodeEntry.j-1);
+                graph["g"][node.toString()][c9KeyNW] = 1;
+            }
         }
     }
     // set cartesian coordinates
