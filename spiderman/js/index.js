@@ -223,37 +223,6 @@ function drawGraph(labels, graph, path) {
     let network = new vis.Network(container, data, options);
 }
 
-function loadGraph() {
-    function onReaderLoad(event) {
-        // save network
-        let network = JSON.parse(event.target.result);
-        console.log("Network:")
-        console.log(network);
-        sessionStorage.setItem("network", JSON.stringify(network));
-        // set selects
-        $("#startNodeSelect").empty();
-        $("#endNodeSelect").empty();
-        $.each(network.l, (key, value) => {
-            let nodeOption = "<option value="
-                + key
-                + ">"
-                + value
-                + "</option>";
-            $(nodeOption).appendTo("#startNodeSelect");
-            $(nodeOption).appendTo("#endNodeSelect");
-        });
-        // show A* control
-        $("#aStarControl").show();
-        // draw graph
-        drawGraph(network.l, network.g, null);
-    }
-    $("#graphJSON").change(function (event) {
-        let reader = new FileReader();
-        reader.onload = onReaderLoad;
-        reader.readAsText(event.target.files[0]);
-    });
-}
-
 function drawPath() {
     $("#calc").click(function () {
         let network =  JSON.parse(sessionStorage.getItem("network"));
@@ -268,170 +237,10 @@ function drawPath() {
 
 // New Code:
 
-// stringHelpers
+/* GRAPH BUILDER */
 
-function removeAccents(strAccents) {
-	strAccents = strAccents.split("");
-	let strAccentsOut = new Array();
-	let strAccentsLen = strAccents.length;
-	let accents = "ÀÁÂÃÄÅàáâãäåÒÓÔÕÕÖØòóôõöøÈÉÊËèéêëðÇçÐÌÍÎÏìíîïÙÚÛÜùúûüŠšŸÿýŽž";
-	let accentsOut = "AAAAAAaaaaaaOOOOOOOooooooEEEEeeeeeCcDIIIIiiiiUUUUuuuuSsYyyZz";
-	for (let y = 0; y < strAccentsLen; y++) {
-		if (accents.indexOf(strAccents[y]) !== -1) {
-			strAccentsOut[y] = accentsOut.substr(accents.indexOf(strAccents[y]), 1);
-		} else {
-			strAccentsOut[y] = strAccents[y];
-		}
-	}
-	strAccentsOut = strAccentsOut.join("");
-	return strAccentsOut;
-}
-
-// removeAccents + toUpperCase
-function fixMessage(input) {
-	return removeAccents(
-        input
-    ).toUpperCase();
-}
-
-function isNormalInteger(str) {
-    let n = Math.floor(Number(str));
-    return n !== Infinity && String(n) === str && n > 0;
-}
-
-// Voice Processor (ONLY GOOGLE CHROME)
-
-class VoiceProcessor {
-    constructor() {
-        this.recognition = null;
-        try {
-            let SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            this.recognition = new SpeechRecognition();
-        }
-        catch(e) {
-            console.error(e);
-            $(".no-browser-support").show();
-            $(".app").hide();
-        }
-        // Configure voice recognition 
-        if (this.recognition) {
-            // If false, the recording will stop after a few seconds of silence.
-            // When true, the silence period is longer (about 15 seconds),
-            // allowing us to keep recording even when the user pauses. 
-            this.recognition.continuous = true;
-            // This block is called every time the Speech APi captures a line. 
-            this.recognition.onresult = function(event) {
-                // event is a SpeechRecognitionEvent object.
-                // It holds all the lines we have captured so far. 
-                // We only need the current one.
-                let current = event.resultIndex;
-                // Get a transcript of what was said.
-                let transcript = event.results[current][0].transcript;
-                sessionStorage.setItem("transcript", transcript);
-                console.log(transcript);
-            }
-            this.recognition.onstart = function() { 
-                console.log("Voice recognition activated.");
-            }
-            this.recognition.onspeechend = function() {
-                console.log("Voice recognition turned off.");
-            }
-            this.recognition.onerror = function(event) {
-                if (event.error == "no-speech") {
-                    console.log("No speech was detected. Try again.");  
-                }
-            }
-        }
-    }
-
-    startRecognition() {
-        this.recognition.start();
-    }
-
-    stopRecognition() {
-        this.recognition.stop();
-    }
-
-    readOutLoud(message) {
-        let speech = new SpeechSynthesisUtterance();
-        // set text and voice attributes
-        speech.text = message;
-        speech.volume = 1;
-        speech.rate = 1;
-        speech.pitch = 1;
-        window.speechSynthesis.speak(speech);
-    }
-}
-
-const voiceProcessor = new VoiceProcessor();
-function controlRecognition() {
-    $(document).on("keypress", function(e) {
-        // if press 1
-        if (e.which === 49) {
-            voiceProcessor.startRecognition();
-        }
-        // if press 0
-        else if (e.which === 48) {
-            voiceProcessor.stopRecognition();
-            // after stop recognition:
-            setTimeout(function() {
-                let transcript = sessionStorage.getItem("transcript");
-                if (transcript) {
-                    sessionStorage.removeItem("transcript");
-                    let command = fixMessage(transcript).split(" ");
-                    if (command[0] === "LIMPIAR") {
-                        window.location = "index.html";
-                    }
-                    // M
-                    else if (command[0] === "ALTURA") {
-                        if (command[1] === "IGUAL" || command[1] === "=") {
-                            if ( isNormalInteger(command[2]) ) {
-                                $("#m").val( "Altura (" + command[2] + ")" );
-                            } else {
-                                voiceProcessor.readOutLoud("Valor inválido.");
-                            }
-                        }
-                    }
-                    // N
-                    else if (command[0] === "LARGO") {
-                        if (command[1] === "IGUAL" || command[1] === "=") {
-                            if ( isNormalInteger(command[2]) ) {
-                                $("#n").val( "Largo (" + command[2] + ")");
-                            } else {
-                                voiceProcessor.readOutLoud("Valor inválido.");
-                            }
-                        }
-                    }
-                    // A
-                    else if (command[0] === "CUADRADO") {
-                        if (command[1] === "IGUAL" || command[1] === "=") {
-                            if ( isNormalInteger(command[2]) ) {
-                                $("#a").val( "Cuadrado (" + command[2] + ")" );
-                            } else {
-                                voiceProcessor.readOutLoud("Valor inválido.");
-                            }
-                        }
-                    }
-                    // D
-                    else if (command[0] === "DIAGONAL") {
-                        if (command[1] === "IGUAL" || command[1] === "=") {
-                            if ( isNormalInteger(command[2]) ) {
-                                $("#d").val( "Diagonal (" + command[2] + ")");
-                            } else {
-                                voiceProcessor.readOutLoud("Valor inválido.");
-                            }
-                        }
-                    } else {
-                        voiceProcessor.readOutLoud("Comando no identificado.");
-                    }
-                } else {
-                    voiceProcessor.readOutLoud("No se ha procesado niguna orden.");
-                }
-            }, 1000);
-        }
-    });
-}
-
+// Only for testing: 
+// download(graph, "test.json", "text/plain");
 function download(content, fileName, contentType) {
     let a = document.createElement("a");
     let file = new Blob([JSON.stringify(content)], {type: contentType});
@@ -440,12 +249,12 @@ function download(content, fileName, contentType) {
     a.click();
 }
 
-function findGraphKeyByEntry(jsonE, i, j) {
+function findGraphKeyByEntry(entries, i, j) {
     // not results found
     let result = -1;
     // search key
-    $.each(jsonE, (currentNode, matEntries) => {
-        if (matEntries.i == i && matEntries.j == j) {
+    $.each(entries, (currentNode, matEntry) => {
+        if (matEntry.i == i && matEntry.j == j) {
             result = currentNode;
             // stop loop
             return false;
@@ -454,7 +263,7 @@ function findGraphKeyByEntry(jsonE, i, j) {
     return result.toString();
 }
 
-function createJSONGraph(m, n) {
+function createJSONGraph(m, n, d) {
     let graph = {};
     let entriesQuant = m * n;
     // set labels
@@ -652,7 +461,7 @@ function createJSONGraph(m, n) {
     }
     // set cartesian coordinates
     let coordinates = [];
-    let height = m;
+    let height = parseInt(m);
     for (let mIndex = 1; mIndex <= m; ++mIndex) {
         for (let nIndex = 1; nIndex <= n; ++nIndex) {
             coordinates.push( {"x": nIndex, "y": height} );
@@ -663,15 +472,238 @@ function createJSONGraph(m, n) {
     for (let node = 1; node <= entriesQuant; ++node) {
         graph["c"][node.toString()] = coordinates[node - 1];
     }
-    console.log(graph);
-    //download(graph, "test.json", "text/plain");
+    return graph;
+}
+
+/* VOICE HANDLER */
+
+// stringHelpers
+
+function removeAccents(strAccents) {
+	strAccents = strAccents.split("");
+	let strAccentsOut = new Array();
+	let strAccentsLen = strAccents.length;
+	let accents = "ÀÁÂÃÄÅàáâãäåÒÓÔÕÕÖØòóôõöøÈÉÊËèéêëðÇçÐÌÍÎÏìíîïÙÚÛÜùúûüŠšŸÿýŽž";
+	let accentsOut = "AAAAAAaaaaaaOOOOOOOooooooEEEEeeeeeCcDIIIIiiiiUUUUuuuuSsYyyZz";
+	for (let y = 0; y < strAccentsLen; y++) {
+		if (accents.indexOf(strAccents[y]) !== -1) {
+			strAccentsOut[y] = accentsOut.substr(accents.indexOf(strAccents[y]), 1);
+		} else {
+			strAccentsOut[y] = strAccents[y];
+		}
+	}
+	strAccentsOut = strAccentsOut.join("");
+	return strAccentsOut;
+}
+
+// removeAccents + toUpperCase
+function fixMessage(input) {
+	return removeAccents(
+        input
+    ).toUpperCase();
+}
+
+function isNormalInteger(str) {
+    let n = Math.floor(Number(str));
+    return n !== Infinity && String(n) === str && n > 0;
+}
+
+// Voice Processor (ONLY GOOGLE CHROME => 2019)
+
+class VoiceProcessor {
+    constructor() {
+        this.recognition = null;
+        try {
+            let SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            this.recognition = new SpeechRecognition();
+        }
+        catch(e) {
+            console.error(e);
+            $(".no-browser-support").show();
+            $(".app").hide();
+        }
+        // Configure voice recognition 
+        if (this.recognition) {
+            // If false, the recording will stop after a few seconds of silence.
+            // When true, the silence period is longer (about 15 seconds),
+            // allowing us to keep recording even when the user pauses. 
+            this.recognition.continuous = true;
+            // This block is called every time the Speech APi captures a line. 
+            this.recognition.onresult = function(event) {
+                // event is a SpeechRecognitionEvent object.
+                // It holds all the lines we have captured so far. 
+                // We only need the current one.
+                let current = event.resultIndex;
+                // Get a transcript of what was said.
+                let transcript = event.results[current][0].transcript;
+                sessionStorage.setItem("transcript", transcript);
+                console.log(transcript);
+            }
+            this.recognition.onstart = function() { 
+                console.log("Voice recognition activated.");
+            }
+            this.recognition.onspeechend = function() {
+                console.log("Voice recognition turned off.");
+            }
+            this.recognition.onerror = function(event) {
+                if (event.error == "no-speech") {
+                    console.log("No speech was detected. Try again.");  
+                }
+            }
+        }
+    }
+
+    startRecognition() {
+        this.recognition.start();
+    }
+
+    stopRecognition() {
+        this.recognition.stop();
+    }
+
+    readOutLoud(message) {
+        let speech = new SpeechSynthesisUtterance();
+        // set text and voice attributes
+        speech.text = message;
+        speech.volume = 1;
+        speech.rate = 1;
+        speech.pitch = 1;
+        window.speechSynthesis.speak(speech);
+    }
+}
+
+const voiceProcessor = new VoiceProcessor();
+function controlRecognition() {
+    $(document).on("keypress", function(e) {
+        // if press 1
+        if (e.which == 49) {
+            voiceProcessor.startRecognition();
+        }
+        // if press 0
+        else if (e.which == 48) {
+            voiceProcessor.stopRecognition();
+            // after stop recognition:
+            setTimeout(function() {
+                let transcript = sessionStorage.getItem("transcript");
+                if (transcript) {
+                    sessionStorage.removeItem("transcript");
+                    let command = fixMessage(transcript).split(" ");
+                    // CLEAR
+                    if (command[0] == "LIMPIAR") {
+                        sessionStorage.clear();
+                        window.location = "index.html";
+                    }
+                    // M
+                    else if (command[0] == "ALTURA" 
+                        || command[0] == "DURA" 
+                        || command[0] == "PINTURA") {
+                            if (command[1] == "IGUAL" || command[1] == "IGUALA" || command[1] == "=") {
+                                let value = 2;
+                                if (command[value] == "A") value = 3;
+                                if ( isNormalInteger(command[value]) ) {
+                                    $("#m").val( "Altura (" + command[value] + ")" );
+                                    sessionStorage.setItem("m", command[value]);
+                                } else {
+                                    voiceProcessor.readOutLoud("Valor inválido.");
+                                }
+                            } else {
+                                voiceProcessor.readOutLoud("Comando no identificado.");
+                            }
+                    }
+                    // N
+                    else if (command[0] == "LARGO"
+                        || command[0] == "CARGO" 
+                        || command[0] == "MARCO" 
+                        || command[0] == "PARTO" 
+                        || command[0] == "HARTO" 
+                        || command[0] == "ARGO") {
+                            if (command[1] == "IGUAL" || command[1] == "IGUALA" || command[1] == "=") {
+                                let value = 2;
+                                if (command[value] == "A") value = 3;
+                                if ( isNormalInteger(command[value]) ) {
+                                    $("#n").val( "Largo (" + command[value] + ")" );
+                                    sessionStorage.setItem("n", command[value]);
+                                } else {
+                                    voiceProcessor.readOutLoud("Valor inválido.");
+                                }
+                            } else {
+                                voiceProcessor.readOutLoud("Comando no identificado.");
+                            }
+                    }
+                    // A
+                    else if (command[0] == "CUADRADO" 
+                        || command[0] == "GRADO") {
+                            if (command[1] == "IGUAL" || command[1] == "IGUALA" || command[1] == "=") {
+                                let value = 2;
+                                if (command[value] == "A") value = 3;
+                                if ( isNormalInteger(command[value]) ) {
+                                    $("#a").val( "Cuadrado (" + command[value] + ")" );
+                                    sessionStorage.setItem("a", command[value]);
+                                } else {
+                                    voiceProcessor.readOutLoud("Valor inválido.");
+                                }
+                            } else {
+                                voiceProcessor.readOutLoud("Comando no identificado.");
+                            }
+                    }
+                    // D
+                    else if (command[0] == "DIAGONAL"
+                        || command[0] == "HERNAN") {
+                            if (command[1] == "SI") {
+                                $("#d").val( "Diagonal (SÍ)");
+                                sessionStorage.setItem("d", "true");
+                            } else if (command[1] == "NO") {
+                                $("#d").val("Diagonal (NO)");
+                                sessionStorage.setItem("d", "false");
+                            } else {
+                                voiceProcessor.readOutLoud("Valor inválido.");
+                            }
+                    } 
+                    // CREATE
+                    else if (command[0] == "CREAR") {
+                        let m = sessionStorage.getItem("m");
+                        let n = sessionStorage.getItem("n");
+                        let a = sessionStorage.getItem("a");
+                        let d = sessionStorage.getItem("d");
+                        if (m && n && a && d) {
+                            let network = createJSONGraph(m, n, d);
+                            console.log("Network:")
+                            console.log(network);
+                            sessionStorage.setItem("network", JSON.stringify(network));
+                            // set selects
+                            $("#startNodeSelect").empty();
+                            $("#endNodeSelect").empty();
+                            $.each(network.l, (key, value) => {
+                                let nodeOption = "<option value="
+                                    + key
+                                    + ">"
+                                    + value
+                                    + "</option>";
+                                $(nodeOption).appendTo("#startNodeSelect");
+                                $(nodeOption).appendTo("#endNodeSelect");
+                            });
+                            // show A* control
+                            $("#aStarControl").show();
+                            // draw graph
+                            drawGraph(network.l, network.g, null);
+
+                        } else {
+                            voiceProcessor.readOutLoud("No se han establecido todos los valores.");
+                        }
+                    } else {
+                        voiceProcessor.readOutLoud("Comando no identificado.");
+                    }
+                } else {
+                    voiceProcessor.readOutLoud("No se ha procesado niguna orden.");
+                }
+            }, 1000);
+        }
+    });
 }
 
 jQuery(
     $(document).ready(function () {
-        loadGraph(),
         drawPath(),
-        controlRecognition(),
-        createJSONGraph(3, 4)
+        controlRecognition()
     })
 );
